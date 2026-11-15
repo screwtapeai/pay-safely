@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "screwtape-pay-safely"
+version = "0.1.0"
+description = "Check that a seller is safe to pay before your AI agent pays. Drop-in for LangChain, LangGraph, CrewAI, OpenAI Agents and AgentKit."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Screwtape.ai", email = "support@screwtape.ai" }]
+keywords = ["ai-agents", "agent-safety", "payments", "langchain", "langgraph", "crewai", "openai-agents", "agentkit", "guardrails"]
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Intended Audience :: Developers",
+]
+dependencies = []
+
+[project.optional-dependencies]
+langchain = ["langchain-core>=0.3"]
+crewai = ["crewai>=0.100"]
+openai-agents = ["openai-agents>=0.1"]
+agentkit = ["coinbase-agentkit>=0.5"]
+test = ["pytest>=8"]
+
+[project.urls]
+Homepage = "https://screwtape.ai"
+Source = "https://github.com/screwtapeai/pay-safely"
+Documentation = "https://screwtape.ai/docs/"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pay_safely"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
