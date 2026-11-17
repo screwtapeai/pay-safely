@@ -4,7 +4,7 @@ Check that a seller is safe to pay **before your AI agent pays**.
 
 `pay-safely` asks [Screwtape.ai](https://screwtape.ai) one question at the moment your agent is about to pay: *is this seller safe to pay?* You get back **allow**, **review** or **block**, with reasons and a signed receipt you can verify later.
 
-It has no required dependencies and drops into LangChain, LangGraph, CrewAI, the OpenAI Agents SDK and AgentKit.
+It has no required dependencies and drops into LangChain, LangGraph, CrewAI, the OpenAI Agents SDK, AgentKit, Haystack, Pydantic AI, LlamaIndex and Agno.
 
 ## What the check looks at
 
@@ -25,6 +25,10 @@ pip install "screwtape-pay-safely[langchain]"      # LangChain and LangGraph
 pip install "screwtape-pay-safely[crewai]"
 pip install "screwtape-pay-safely[openai-agents]"
 pip install "screwtape-pay-safely[agentkit]"
+pip install "screwtape-pay-safely[haystack]"
+pip install "screwtape-pay-safely[pydantic-ai]"
+pip install "screwtape-pay-safely[llama-index]"
+pip install "screwtape-pay-safely[agno]"
 ```
 
 ## Use it in plain Python
@@ -95,6 +99,45 @@ from pay_safely.agentkit import pay_safely_action_provider
 
 # add to the action_providers list in your AgentKit config
 provider = pay_safely_action_provider(PaySafely(agent_id="buyer"))
+```
+
+## Haystack
+
+```python
+from pay_safely import PaySafely
+from pay_safely.haystack import SellerCheck
+
+check = SellerCheck(guard=PaySafely(agent_id="buyer"))
+print(check.run(seller_url="https://seller.example/pay", amount_usd=0.05)["result"])
+```
+
+## Pydantic AI
+
+```python
+from pydantic_ai import Agent
+from pay_safely import PaySafely
+from pay_safely.pydantic_ai import seller_check_capability
+
+agent = Agent("openai:gpt-4o", capabilities=[seller_check_capability(PaySafely(agent_id="buyer"))])
+```
+
+## LlamaIndex
+
+```python
+from pay_safely import PaySafely
+from pay_safely.llama_index import seller_check_tool
+
+tools = [seller_check_tool(PaySafely(agent_id="buyer"))]
+```
+
+## Agno
+
+```python
+from agno.agent import Agent
+from pay_safely import PaySafely
+from pay_safely.agno import SellerCheckTools
+
+agent = Agent(tools=[SellerCheckTools(guard=PaySafely(agent_id="buyer"))])
 ```
 
 ## Free checks, keys and paid use

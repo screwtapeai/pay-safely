@@ -176,7 +176,7 @@ class PaySafely:
             body["payment_required"] = payment_required
         if amount is not None:
             body["intended_amount"] = float(amount)
-        headers = {"content-type": "application/json", "accept": "application/json", "user-agent": "screwtape-pay-safely/0.1"}
+        headers = {"content-type": "application/json", "accept": "application/json", "user-agent": "screwtape-pay-safely/0.2"}
         if self.api_key:
             headers["authorization"] = f"Bearer {self.api_key}"
         try:

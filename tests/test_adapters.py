@@ -68,3 +68,66 @@ def test_agentkit_action_provider():
     actions = provider.get_actions(None)
     assert [a.name for a in actions] == ["pay_safely_check_seller_before_paying"] or actions[0].name.endswith("check_seller_before_paying")
     assert actions[0].invoke({"seller_url": "https://seller.example/p"}).startswith("Safe to pay")
+
+
+def test_haystack_component():
+    pytest.importorskip("haystack")
+    from pay_safely.haystack import SellerCheck
+
+    blocked = SellerCheck(guard=guard_with("block")).run("https://seller.example/p", 1.0)
+    assert blocked["result"].startswith("Do not pay")
+    allowed = SellerCheck(guard=guard_with("allow")).run("https://seller.example/p", 1.0)
+    assert allowed["result"].startswith("Safe to pay")
+
+
+def test_pydantic_ai_capability():
+    pytest.importorskip("pydantic_ai")
+    from pay_safely.pydantic_ai import seller_check_capability
+
+    cap = seller_check_capability(guard_with("allow"))
+    assert cap.id == "paysafely-seller-check"
+    # Resolve the registered tool and call it.
+    toolset = cap.get_toolset() if hasattr(cap, "get_toolset") else None
+    called = False
+    if toolset is not None and hasattr(toolset, "tools"):
+        tools = toolset.tools
+        if isinstance(tools, dict):
+            tools = list(tools.values())
+        for tool in tools or []:
+            fn = getattr(tool, "function", None) or getattr(tool, "fn", None) or getattr(tool, "call", None)
+            if callable(fn):
+                result = fn(seller_url="https://seller.example/p", amount_usd=1.0)
+                assert str(result).startswith("Safe to pay")
+                called = True
+                break
+    if not called:
+        # Fallback: walk capability attributes for the wrapped function.
+        for name in dir(cap):
+            if name.startswith("_"):
+                continue
+            obj = getattr(cap, name)
+            if callable(obj) and getattr(obj, "__name__", "") == "check_seller_before_paying":
+                assert obj("https://seller.example/p", 1.0).startswith("Safe to pay")
+                called = True
+                break
+    assert called, "could not invoke the Pydantic AI seller-check tool"
+
+
+def test_llama_index_tool():
+    pytest.importorskip("llama_index.core")
+    from pay_safely.llama_index import seller_check_tool
+
+    tool = seller_check_tool(guard_with("allow"))
+    assert tool.metadata.name == "check_seller_before_paying"
+    result = tool.call(seller_url="https://seller.example/p", amount_usd=1.0)
+    text = result if isinstance(result, str) else getattr(result, "content", None) or str(result)
+    assert "Safe to pay" in text
+
+
+def test_agno_toolkit():
+    pytest.importorskip("agno")
+    from pay_safely.agno import SellerCheckTools
+
+    tools = SellerCheckTools(guard=guard_with("block"))
+    assert tools.check_seller_before_paying("https://seller.example/p", 1.0).startswith("Do not pay")
+    assert "check_seller_before_paying" in getattr(tools, "functions", {}) or tools.name == "paysafely_seller_check"

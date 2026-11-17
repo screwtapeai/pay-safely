@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "screwtape-pay-safely"
-version = "0.1.0"
-description = "Check that a seller is safe to pay before your AI agent pays. Drop-in for LangChain, LangGraph, CrewAI, OpenAI Agents and AgentKit."
+version = "0.2.0"
+description = "Check that a seller is safe to pay before your AI agent pays. Drop-in for LangChain, LangGraph, CrewAI, OpenAI Agents, AgentKit, Haystack, Pydantic AI, LlamaIndex and Agno."
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [{ name = "Screwtape.ai", email = "support@screwtape.ai" }]
-keywords = ["ai-agents", "agent-safety", "payments", "langchain", "langgraph", "crewai", "openai-agents", "agentkit", "guardrails"]
+keywords = ["ai-agents", "agent-safety", "payments", "langchain", "langgraph", "crewai", "openai-agents", "agentkit", "haystack", "pydantic-ai", "llama-index", "agno", "guardrails"]
 classifiers = [
   "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
@@ -23,6 +23,10 @@ langchain = ["langchain-core>=0.3"]
 crewai = ["crewai>=0.100"]
 openai-agents = ["openai-agents>=0.1"]
 agentkit = ["coinbase-agentkit>=0.5"]
+haystack = ["haystack-ai>=2.0"]
+pydantic-ai = ["pydantic-ai>=0.4"]
+llama-index = ["llama-index-core>=0.11"]
+agno = ["agno>=1.0"]
 test = ["pytest>=8"]
 
 [project.urls]
